@@ -46,7 +46,6 @@ def main():
     plot_response(T, V, I, F)
 
 
-@njit(parallel=True)
 def compute(generators, neurons, V, T, I, F, synapses):
     for t in range(0, len(T)):
         for generator in generators:
