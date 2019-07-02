@@ -99,5 +99,4 @@ def plot_response(T, V, I, F):
 
 
 if __name__ == '__main__':
-    mp.freeze_support()
     main()
