@@ -48,7 +48,7 @@ uint16_t SR0, SR1, SR2, SR3, SR4, SR5, SR6, SR7;
 char* ssid = "GPT";
 const char* password = "otrotipoA1";
 
-const uint16_t port = 9000;
+const uint16_t port = 5000;
 const char * host = "192.168.0.17";
 
 String sentMessage = "";
@@ -120,16 +120,6 @@ void loop() {
     sentMessage += "SR5: " + String(SR5, DEC) + " ; ";
     sentMessage += "SR6: " + String(SR6, DEC) + " ; ";
     sentMessage += "SR7: " + String(SR7, DEC) + " ; ";
-
-    sentMessage += String(angle0, DEC) + " ";
-    sentMessage += String(angle1, DEC) + " ";
-    sentMessage += String(angle2, DEC) + " ";
-    sentMessage += String(angle3, DEC) + " ";
-    sentMessage += String(angle4, DEC) + " ";
-    sentMessage += String(angle5, DEC) + " ";
-    sentMessage += String(angle6, DEC) + " ";
-    sentMessage += String(angle7, DEC) + " ";
-    sentMessage += String(angle8, DEC) + " ";
     client.println(sentMessage);
     
     receivedMessage = "";
@@ -137,6 +127,7 @@ void loop() {
       receivedChar = client.read();
       
       if (receivedChar == '\n') { // New line is the end of the message 
+        // Extracts each axis angle from the message string
         angle0 = receivedMessage.substring((receivedMessage.indexOf("AX0: ")+5), receivedMessage.indexOf(" ; AX1")).toInt();
         angle1 = receivedMessage.substring((receivedMessage.indexOf("AX1: ")+5), receivedMessage.indexOf(" ; AX2")).toInt();
         angle2 = receivedMessage.substring((receivedMessage.indexOf("AX2: ")+5), receivedMessage.indexOf(" ; AX3")).toInt();
@@ -146,7 +137,7 @@ void loop() {
         angle6 = receivedMessage.substring((receivedMessage.indexOf("AX6: ")+5), receivedMessage.indexOf(" ; AX7")).toInt();
         angle7 = receivedMessage.substring((receivedMessage.indexOf("AX7: ")+5), receivedMessage.indexOf(" ; AX8")).toInt();
         angle8 = receivedMessage.substring((receivedMessage.indexOf("AX8: ")+5), receivedMessage.lastIndexOf(" ;")).toInt();
-
+        
         Axis0.write(angle0);
         Axis1.write(angle1);
         Axis2.write(angle2);
