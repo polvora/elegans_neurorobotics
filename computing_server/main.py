@@ -5,6 +5,8 @@ from numba import njit
 
 import matplotlib.pyplot as matlab
 from builder import *
+from linker import *
+from gui import *
 
 
 def main():
@@ -13,7 +15,10 @@ def main():
     # file_name = './connectome/c302_B_Syns.net.nml'
     file_name = './connectome/c302_B_Full.net.nml'
 
-    builder = Builder(file_name)
+    linker = Linker("0.0.0.0", 5000)  # Creates link to robotic interface
+    gui = GUI()
+
+    builder = Builder(file_name) # Builds connectome from NeuroML file
     print("Loaded network file from: " + file_name)
     generators = builder.build_generators()
     print("Found {} generators in network: ".format(len(generators)))
@@ -38,6 +43,8 @@ def main():
 
     start_time = time.time()
 
+    linker.start()  # Starts connection to linked robotic interface
+    gui.start()
     compute(generators, neurons, V, T, I, F, synapses)
 
     elapsed_time = time.time() - start_time

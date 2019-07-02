@@ -1,8 +1,8 @@
 import socket
-import threading
+from threading import *
 
 
-class Linker(threading.Thread):
+class Linker(Thread):
     def __init__(self, host, port):
         super(Linker, self).__init__()
         self.server = socket.socket()
