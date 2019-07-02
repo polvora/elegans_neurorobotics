@@ -16,7 +16,7 @@ def main():
     file_name = './connectome/c302_B_Full.net.nml'
 
     linker = Linker("0.0.0.0", 5000)  # Creates link to robotic interface
-    gui = GUI()
+    gui = GUI()  # Creates new monitor interface
 
     builder = Builder(file_name) # Builds connectome from NeuroML file
     print("Loaded network file from: " + file_name)
@@ -30,7 +30,7 @@ def main():
     print("Found {} synapses in network: ".format(len(synapses)))
     print(*synapses, sep='\n')
 
-    simulation_time = 3
+    simulation_time = 0.01
     dt = 0.0002
     T = frange(0, simulation_time, dt)
     V = dict()
@@ -44,16 +44,9 @@ def main():
     start_time = time.time()
 
     linker.start()  # Starts connection to linked robotic interface
-    gui.start()
-    compute(generators, neurons, V, T, I, F, synapses)
+    gui.start()  # Starts visual monitoring
+    gui.add_neurons(neurons)  # Adds all the neurons to the table
 
-    elapsed_time = time.time() - start_time
-
-    print_statistics(simulation_time, dt, elapsed_time, len(generators), len(neurons), len(synapses))
-    plot_response(T, V, I, F)
-
-
-def compute(generators, neurons, V, T, I, F, synapses):
     for t in range(0, len(T)):
         for generator in generators:
             generator.compute(neurons, T[t])
@@ -66,6 +59,11 @@ def compute(generators, neurons, V, T, I, F, synapses):
 
         for synapse in synapses:
             synapse.compute(neurons, T[t])
+
+    elapsed_time = time.time() - start_time
+
+    print_statistics(simulation_time, dt, elapsed_time, len(generators), len(neurons), len(synapses))
+    plot_response(T, V, I, F)
 
 
 def print_statistics(simulation_time, dt, elapsed_time, n_generators, n_neurons, n_synapses):

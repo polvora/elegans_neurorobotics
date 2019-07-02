@@ -15,14 +15,14 @@ class Linker(Thread):
 
         self.messageCounter = 0
 
-        self.run = True
+        self.running = True
 
     def run(self):
-        while self.run:  # Checks if tasks should keep running
+        while self.running:  # Checks if tasks should keep running
             client, address = self.server.accept()
             print("Opening connection")
 
-            while self.run:  # Checks if tasks should keep running
+            while self.running:  # Checks if tasks should keep running
                 client.settimeout(5.0)  # Sets 5 seconds of timeout
                 try:
                     content = client.recv(1)  # Receives the incoming characters one by one
@@ -52,4 +52,4 @@ class Linker(Thread):
             client.close()
 
     def stop(self):
-        self.run = False
+        self.running = False

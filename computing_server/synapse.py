@@ -67,7 +67,7 @@ class GapJunction(object):
         self.last_time = 0
 
     def __str__(self):
-        return "SYNAPSE (GAP JUNCTION): Conductance: " + str(self.g) + "[S] ; Weight: " + str(self.weight) + \
+        return "SYNAPSE (Gap Junction): Conductance: " + str(self.g) + "[S] ; Weight: " + str(self.weight) + \
                " ; Pre-synaptic Neuron Tag: " + self.pre_neuron + " ; Post-synaptic Neuron Tag: " + self.post_neuron
 
     def compute(self, neurons, time):
