@@ -34,14 +34,16 @@ Servo Axis6;
 Servo Axis7;
 Servo Axis8;
 
+long angle0, angle1, angle2, angle3, angle4, angle5, angle6, angle7, angle8;
+
 // ADCs
 Adafruit_ADS1115 ADC0(ADC_ADDR0);
 Adafruit_ADS1115 ADC1(ADC_ADDR1);
 Adafruit_ADS1115 ADC2(ADC_ADDR2);
 Adafruit_ADS1115 ADC3(ADC_ADDR3);
 
-uint16_t SL0, SL1, SL2, SL3, SL4, SL5, SL6, SL7, SL8;
-uint16_t SR0, SR1, SR2, SR3, SR4, SR5, SR6, SR7, SR8;
+uint16_t SL0, SL1, SL2, SL3, SL4, SL5, SL6, SL7;
+uint16_t SR0, SR1, SR2, SR3, SR4, SR5, SR6, SR7;
 
 char* ssid = "GPT";
 const char* password = "otrotipoA1";
@@ -49,7 +51,9 @@ const char* password = "otrotipoA1";
 const uint16_t port = 9000;
 const char * host = "192.168.0.17";
 
-String message;
+String sentMessage = "";
+String receivedMessage = "";
+char receivedChar = 0;
 
 void setup() {
   // Assigns Digital outputs to each axis
@@ -94,15 +98,69 @@ void loop() {
   }
   // Work while connected
   while (client.connected()) { 
+    // Analog sensors read
     SL0 = ADC0.readADC_SingleEnded(0);
     SL1 = ADC0.readADC_SingleEnded(1);
     SL2 = ADC0.readADC_SingleEnded(2);
     SL3 = ADC0.readADC_SingleEnded(3);
-    message = "SL0: " + String(SL0, DEC) + " ; ";
-    message += "SL1: " + String(SL1, DEC) + " ; ";
-    message += "SL2: " + String(SL2, DEC) + " ; ";
-    message += "SL3: " + String(SL3, DEC) + " ; ";
-    client.println(message); 
+    // Data packaging 
+    sentMessage = "SL0: " + String(SL0, DEC) + " ; ";
+    sentMessage += "SL1: " + String(SL1, DEC) + " ; ";
+    sentMessage += "SL2: " + String(SL2, DEC) + " ; ";
+    sentMessage += "SL3: " + String(SL3, DEC) + " ; "; 
+    sentMessage += "SL4: " + String(SL4, DEC) + " ; "; 
+    sentMessage += "SL5: " + String(SL5, DEC) + " ; "; 
+    sentMessage += "SL6: " + String(SL6, DEC) + " ; "; 
+    sentMessage += "SL7: " + String(SL7, DEC) + " ; "; 
+    sentMessage += "SR0: " + String(SR0, DEC) + " ; "; 
+    sentMessage += "SR1: " + String(SR1, DEC) + " ; ";
+    sentMessage += "SR2: " + String(SR2, DEC) + " ; ";
+    sentMessage += "SR3: " + String(SR3, DEC) + " ; ";
+    sentMessage += "SR4: " + String(SR4, DEC) + " ; ";
+    sentMessage += "SR5: " + String(SR5, DEC) + " ; ";
+    sentMessage += "SR6: " + String(SR6, DEC) + " ; ";
+    sentMessage += "SR7: " + String(SR7, DEC) + " ; ";
+
+    sentMessage += String(angle0, DEC) + " ";
+    sentMessage += String(angle1, DEC) + " ";
+    sentMessage += String(angle2, DEC) + " ";
+    sentMessage += String(angle3, DEC) + " ";
+    sentMessage += String(angle4, DEC) + " ";
+    sentMessage += String(angle5, DEC) + " ";
+    sentMessage += String(angle6, DEC) + " ";
+    sentMessage += String(angle7, DEC) + " ";
+    sentMessage += String(angle8, DEC) + " ";
+    client.println(sentMessage);
+    
+    receivedMessage = "";
+    while (client.available()) {
+      receivedChar = client.read();
+      
+      if (receivedChar == '\n') { // New line is the end of the message 
+        angle0 = receivedMessage.substring((receivedMessage.indexOf("AX0: ")+5), receivedMessage.indexOf(" ; AX1")).toInt();
+        angle1 = receivedMessage.substring((receivedMessage.indexOf("AX1: ")+5), receivedMessage.indexOf(" ; AX2")).toInt();
+        angle2 = receivedMessage.substring((receivedMessage.indexOf("AX2: ")+5), receivedMessage.indexOf(" ; AX3")).toInt();
+        angle3 = receivedMessage.substring((receivedMessage.indexOf("AX3: ")+5), receivedMessage.indexOf(" ; AX4")).toInt();
+        angle4 = receivedMessage.substring((receivedMessage.indexOf("AX4: ")+5), receivedMessage.indexOf(" ; AX5")).toInt();
+        angle5 = receivedMessage.substring((receivedMessage.indexOf("AX5: ")+5), receivedMessage.indexOf(" ; AX6")).toInt();
+        angle6 = receivedMessage.substring((receivedMessage.indexOf("AX6: ")+5), receivedMessage.indexOf(" ; AX7")).toInt();
+        angle7 = receivedMessage.substring((receivedMessage.indexOf("AX7: ")+5), receivedMessage.indexOf(" ; AX8")).toInt();
+        angle8 = receivedMessage.substring((receivedMessage.indexOf("AX8: ")+5), receivedMessage.lastIndexOf(" ;")).toInt();
+
+        Axis0.write(angle0);
+        Axis1.write(angle1);
+        Axis2.write(angle2);
+        Axis3.write(angle3);
+        Axis4.write(angle4);
+        Axis5.write(angle5);
+        Axis6.write(angle6);
+        Axis7.write(angle7);
+        Axis8.write(angle8);
+      }
+      else { // Message keeps going
+        receivedMessage += receivedChar;
+      }
+    }
     delay(1000);
   }
   client.stop();
