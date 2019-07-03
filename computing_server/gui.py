@@ -15,28 +15,45 @@ class GUI:
                  fg='blue',
                  bg='white',
                  font=('Arial', 16, 'bold'))\
-            .grid(column=0, row=0, columnspan=30)
+            .grid(column=0,
+                  row=0,
+                  columnspan=30)
 
         self.time_label = tK.Label(self.window,
                                    text="Simulation time: 4.4s",
                                    fg='orange',
                                    bg='white',
+                                   anchor=tK.E,
                                    font=('Arial', 12, 'bold'))
-        self.time_label.grid(column=0, row=1)
+        self.time_label.grid(column=0,
+                             row=1)
 
         self.robot_status = tK.Label(self.window,
                                      text="Robot State: DISCONNECTED",
                                      fg='orange',
                                      bg='white',
                                      font=('Arial', 12, 'bold'))
-        self.robot_status.grid(column=0, row=2)
+        self.robot_status.grid(column=0,
+                               row=2)
 
     def add_neurons(self, neurons, plotter):
         c = 10
         r = 1
         for k in neurons:
-            l = tK.Label(self.window, text=k, fg='black', bg='whitesmoke', font=('Helvetica', 12))
-            l.grid(column=c, row=r)
+            l = tK.Label(self.window,
+                         text=k,
+                         fg='black',
+                         bg='whitesmoke',
+                         bd=1,
+                         relief=tK.SOLID,
+                         width=8,
+                         font=('Helvetica', 12)
+                         )
+            l.grid(column=c,
+                   row=r,
+                   padx=1,
+                   pady=2,
+                   )
             l.bind("<Button-1>", partial(plotter, key=k))
             self.neurons[k] = l
 
@@ -48,10 +65,10 @@ class GUI:
 
     def update_neuron(self, key, frequency):
         if frequency > 0:
-            self.neurons[key].config(bg='red')
+            self.neurons[key].config(bg='tomato')
         else:
-            self.neurons[key].config(bg='grey90', fg='grey20')
-        pass
+            self.neurons[key].config(bg='whitesmoke',
+                                     fg='grey20')
 
     def update_time(self, time):
         self.time_label.config(text='Simulation time: {:05.2f}s'.format(time))

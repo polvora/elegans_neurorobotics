@@ -71,8 +71,6 @@ class Linker(Thread):
 
     def stop(self):
         self.running = False
-        self.server.close()
-
         print('ROBOT LINK: Robotic worm UNLINKED.')
 
     def is_connected(self):
