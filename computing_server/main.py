@@ -1,8 +1,8 @@
 from __future__ import print_function
 import time
-import multiprocessing as mp
+# import multiprocessing as mp
 import threading
-from numba import njit
+# from numba import njit
 
 import matplotlib.pyplot as matlab
 from builder import *
@@ -31,7 +31,7 @@ def main():
     linker = Linker("0.0.0.0", 5000)  # Creates link to robotic interface
     gui = GUI()  # Creates new visual monitoring interface
 
-    builder = Builder(file_name) # Builds connectome from NeuroML file
+    builder = Builder(file_name)  # Builds connectome from NeuroML file
     print("Loaded network file from: " + file_name)
     generators = builder.build_generators()
     print("Found {} generators in network: ".format(len(generators)))
@@ -80,6 +80,7 @@ def main():
             # Updates the time each 0.01 seconds
             if T[t]*100 % 1 == 0:
                 gui.update_time(T[t])
+                gui.update_robot_status(linker.is_connected())
 
             update_counter += 1
             current_time = t
@@ -97,6 +98,7 @@ def main():
 
     # After this point, the GUI is closed, meaning the program should end
     linker.stop()  # Stops connection with robot worm
+    linker.join()  # Waits till linker thread stops
     running = False  # Stops simulation thread
 
 
@@ -122,7 +124,7 @@ def plot_response(_event, key):
     global current_time
     matlab.figure()
 
-    print("Showing Plot Response for Neuron: " + key)
+    print("GUI: Showing Plot Response for Neuron: " + key)
 
     v_plot = matlab.subplot(3, 1, 1)
     matlab.plot(T, V[key])

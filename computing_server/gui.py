@@ -24,6 +24,13 @@ class GUI:
                                    font=('Arial', 12, 'bold'))
         self.time_label.grid(column=0, row=1)
 
+        self.robot_status = tK.Label(self.window,
+                                     text="Robot State: DISCONNECTED",
+                                     fg='orange',
+                                     bg='white',
+                                     font=('Arial', 12, 'bold'))
+        self.robot_status.grid(column=0, row=2)
+
     def add_neurons(self, neurons, plotter):
         c = 10
         r = 1
@@ -48,6 +55,12 @@ class GUI:
 
     def update_time(self, time):
         self.time_label.config(text='Simulation time: {:05.2f}s'.format(time))
+
+    def update_robot_status(self, status):
+        if status:
+            self.robot_status.config(text='Robot State: CONNECTED')
+        else:
+            self.robot_status.config(text='Robot State: DISCONNECTED')
 
     def start(self):
         self.window.mainloop()
