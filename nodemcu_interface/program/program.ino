@@ -152,7 +152,7 @@ void loop() {
         receivedMessage += receivedChar;
       }
     }
-    delay(1000);
+    delay(100);
   }
   client.stop();
 }

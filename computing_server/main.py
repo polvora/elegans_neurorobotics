@@ -78,9 +78,10 @@ def main():
                 synapse.compute(neurons, T[t])
 
             # Updates the time each 0.01 seconds
-            if T[t]*100 % 1 == 0:
+            if T[t]*1000 % 1 == 0:
                 gui.update_time(T[t])
                 gui.update_robot_status(linker.is_connected())
+                linker.update_time(T[t])
 
             update_counter += 1
             current_time = t
@@ -95,6 +96,8 @@ def main():
     threading.Thread(target=compute).start()
 
     gui.start()
+
+    linker.compute_axes()
 
     # After this point, the GUI is closed, meaning the program should end
     linker.stop()  # Stops connection with robot worm

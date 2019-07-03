@@ -1,5 +1,6 @@
 import socket
 from threading import *
+import math
 
 
 class Linker(Thread):
@@ -22,6 +23,8 @@ class Linker(Thread):
 
         self.client_connected = False
 
+        self.time = 0
+
     def run(self):
         while self.running:  # Checks if tasks should keep running
             self.server.settimeout(1.0)
@@ -32,15 +35,15 @@ class Linker(Thread):
                 pass
 
             if client is not None:
-                print("LINKER: Opening connection")
+                print("ROBOT LINK: Opening connection")
                 self.client_connected = True
 
                 while self.running:  # Checks if tasks should keep running
-                    client.settimeout(5.0)  # Sets 5 seconds of timeout
+                    client.settimeout(10.0)  # Sets 5 seconds of timeout
                     try:
                         content = client.recv(1)  # Receives the incoming characters one by one
                     except socket.timeout:
-                        print("LINKER: Client dropped")
+                        print("ROBOT LINK: Client dropped")
                         client.close()
                         break  # If there is a timeout connection is dropped and server starts listening again
                     # Concatenates the new character to the message
@@ -53,17 +56,16 @@ class Linker(Thread):
                         self.messageCounter += 1  # Increments the message identifier counter
                         self.receivedMessage = self.receivedMessage[
                                                0:-1]  # Cuts the new line character out of the string
-                        print("LINKER: received: \t\t" + self.receivedMessage)  # Prints received string to the console
+                        print("ROBOT LINK: received: \t\t" + self.receivedMessage)  # Prints received string to the console
                         self.receivedMessage = ""  # Prepares string for the next message
 
                         # Replies the received sensor data with the intended axis positions
-                        self.sentMessage = "AX0: 090 ; AX1: 090 ; AX2: 090 ; AX3: 090 ; AX4: 090 ; " + \
-                                           "AX5: 090 ; AX6: 090 ; AX7: 090 ; AX8: 090 ; \n"
+                        self.sentMessage = self.compute_axes()
                         client.sendall(self.sentMessage)  # Sends new conformed message to the worm
                         # Prints sent string to the console
-                        print("LINKER: sent: (" + str(self.messageCounter).zfill(5) + ")\t" + self.sentMessage[0:-1])
+                        print("ROBOT LINK: sent: (" + str(self.messageCounter).zfill(5) + ")\t" + self.sentMessage[0:-1])
 
-                print("LINKER: Closing connection")
+                print("ROBOT LINK: Closing connection")
                 client.close()
                 self.client_connected = False
 
@@ -71,8 +73,19 @@ class Linker(Thread):
         self.running = False
         self.server.close()
 
-        print('LINKER: Robotic worm UNLINKED.')
+        print('ROBOT LINK: Robotic worm UNLINKED.')
 
     def is_connected(self):
         return self.client_connected
 
+    def update_time(self, time):
+        self.time = time
+
+    def compute_axes(self):
+        message = ""
+        for n in range(0, 9):
+            axis_angle = 90 + (40*math.cos(n + (10*self.time)))
+            message += "AX{:d}: {:03.0f} ; ".format(n, axis_angle)
+
+        message += "\n"
+        return message
