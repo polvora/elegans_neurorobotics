@@ -1,6 +1,7 @@
 from __future__ import print_function
 import time
 import multiprocessing as mp
+import threading
 from numba import njit
 
 import matplotlib.pyplot as matlab
@@ -16,7 +17,7 @@ def main():
     file_name = './connectome/c302_B_Full.net.nml'
 
     linker = Linker("0.0.0.0", 5000)  # Creates link to robotic interface
-    gui = GUI()  # Creates new monitor interface
+    gui = GUI()  # Creates new visual monitoring interface
 
     builder = Builder(file_name) # Builds connectome from NeuroML file
     print("Loaded network file from: " + file_name)
@@ -30,7 +31,7 @@ def main():
     print("Found {} synapses in network: ".format(len(synapses)))
     print(*synapses, sep='\n')
 
-    simulation_time = 0.01
+    simulation_time = 20
     dt = 0.0002
     T = frange(0, simulation_time, dt)
     V = dict()
@@ -44,21 +45,35 @@ def main():
     start_time = time.time()
 
     linker.start()  # Starts connection to linked robotic interface
-    gui.start()  # Starts visual monitoring
     gui.add_neurons(neurons)  # Adds all the neurons to the table
 
-    for t in range(0, len(T)):
-        for generator in generators:
-            generator.compute(neurons, T[t])
+    def compute():
+        update_counter = 0
+        for t in range(0, len(T)):
+            update_counter += 1
 
-        for tag in neurons:
-            neurons[tag].compute(T[t])
-            V[tag][t] = neurons[tag].get_last_voltage()
-            I[tag][t] = neurons[tag].get_last_current()
-            F[tag][t] = neurons[tag].get_last_frequency()
+            for generator in generators:
+                generator.compute(neurons, T[t])
 
-        for synapse in synapses:
-            synapse.compute(neurons, T[t])
+            for tag in neurons:
+                neurons[tag].compute(T[t])
+
+                V[tag][t] = neurons[tag].get_last_voltage()
+                I[tag][t] = neurons[tag].get_last_current()
+                F[tag][t] = neurons[tag].get_last_frequency()
+
+                if update_counter == 100:
+                    gui.update_neuron(tag, F[tag][t])
+                elif update_counter > 100:
+                    update_counter = 0
+
+            for synapse in synapses:
+                synapse.compute(neurons, T[t])
+
+            if T[t]*100 % 1 == 0:
+                gui.update_time(T[t])
+
+    threading.Thread(target=compute).start()
 
     elapsed_time = time.time() - start_time
 
