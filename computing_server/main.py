@@ -9,8 +9,20 @@ from builder import *
 from linker import *
 from gui import *
 
+max_simulation_time = 20
+dt = 0.0002
+T = frange(0, max_simulation_time, dt)
+V = dict()
+I = dict()
+F = dict()
+
+current_time = 0
+running = True
+
 
 def main():
+    global T, V, I, F, running
+
     # file_name = './connectome/c302_A_IClamp.net.nml'
     # file_name = './connectome/c302_A_Syns.net.nml'
     # file_name = './connectome/c302_B_Syns.net.nml'
@@ -31,12 +43,6 @@ def main():
     print("Found {} synapses in network: ".format(len(synapses)))
     print(*synapses, sep='\n')
 
-    simulation_time = 20
-    dt = 0.0002
-    T = frange(0, simulation_time, dt)
-    V = dict()
-    I = dict()
-    F = dict()
     # For every neuron  it is created a new time list in V
     [V.setdefault(k, [0] * len(T)) for k in neurons]
     [I.setdefault(k, [0] * len(T)) for k in neurons]
@@ -45,13 +51,13 @@ def main():
     start_time = time.time()
 
     linker.start()  # Starts connection to linked robotic interface
-    gui.add_neurons(neurons)  # Adds all the neurons to the table
+    gui.add_neurons(neurons, plot_response)  # Adds all the neurons to the table
 
     def compute():
+        global current_time, running
         update_counter = 0
+        t = 0
         for t in range(0, len(T)):
-            update_counter += 1
-
             for generator in generators:
                 generator.compute(neurons, T[t])
 
@@ -62,6 +68,7 @@ def main():
                 I[tag][t] = neurons[tag].get_last_current()
                 F[tag][t] = neurons[tag].get_last_frequency()
 
+                # Updates the GUI each 100 ticks
                 if update_counter == 100:
                     gui.update_neuron(tag, F[tag][t])
                 elif update_counter > 100:
@@ -70,18 +77,30 @@ def main():
             for synapse in synapses:
                 synapse.compute(neurons, T[t])
 
+            # Updates the time each 0.01 seconds
             if T[t]*100 % 1 == 0:
                 gui.update_time(T[t])
 
+            update_counter += 1
+            current_time = t
+
+            if not running:
+                print ('Connectome simulation STOPPED')
+                break
+
+        elapsed_time = time.time() - start_time
+        print_statistics(T[t], elapsed_time, len(generators), len(neurons), len(synapses))
+
     threading.Thread(target=compute).start()
 
-    elapsed_time = time.time() - start_time
+    gui.start()
 
-    print_statistics(simulation_time, dt, elapsed_time, len(generators), len(neurons), len(synapses))
-    plot_response(T, V, I, F)
+    # After this point, the GUI is closed, meaning the program should end
+    linker.stop()  # Stops connection with robot worm
+    running = False  # Stops simulation thread
 
 
-def print_statistics(simulation_time, dt, elapsed_time, n_generators, n_neurons, n_synapses):
+def print_statistics(simulation_time, elapsed_time, n_generators, n_neurons, n_synapses):
     steps = simulation_time / dt
     time_performance = elapsed_time / simulation_time
     steps_performance = steps / elapsed_time
@@ -99,21 +118,29 @@ def print_statistics(simulation_time, dt, elapsed_time, n_generators, n_neurons,
           )
 
 
-def plot_response(T, V, I, F):
-    matlab.subplot(3, 1, 1)
-    matlab.plot(T, V['MDR01'])
+def plot_response(_event, key):
+    global current_time
+    matlab.figure()
+
+    print("Showing Plot Response for Neuron: " + key)
+
+    v_plot = matlab.subplot(3, 1, 1)
+    matlab.plot(T, V[key])
     matlab.xlabel('Time[s]')
     matlab.ylabel('Voltage[V]')
+    v_plot.set_xlim(left=0, right=T[current_time])
 
-    matlab.subplot(3, 1, 2)
-    matlab.plot(T, I['MDR01'], color='orange')
+    a_plot = matlab.subplot(3, 1, 2)
+    matlab.plot(T, I[key], color='orange')
     matlab.xlabel('Time[s]')
     matlab.ylabel('Current[A]')
+    a_plot.set_xlim(left=0, right=T[current_time])
 
-    matlab.subplot(3, 1, 3)
-    matlab.plot(T, F['MDR01'], color='green')
+    f_plot = matlab.subplot(3, 1, 3)
+    matlab.plot(T, F[key], color='green')
     matlab.xlabel('Time[s]')
     matlab.ylabel('Frequency[Hz]')
+    f_plot.set_xlim(left=0, right=T[current_time])
 
     matlab.show()
 

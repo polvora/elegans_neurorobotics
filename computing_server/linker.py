@@ -53,3 +53,4 @@ class Linker(Thread):
 
     def stop(self):
         self.running = False
+        print('Robotic worm UNLINKED.')
