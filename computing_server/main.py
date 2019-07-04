@@ -3,14 +3,15 @@ import time
 # import multiprocessing as mp
 import threading
 # from numba import njit
+import time
 
 import matplotlib.pyplot as matlab
 from builder import *
 from linker import *
 from gui import *
 
-max_simulation_time = 20
-dt = 0.0002
+max_simulation_time = 100
+dt = 0.002
 T = frange(0, max_simulation_time, dt)
 V = dict()
 I = dict()
@@ -27,6 +28,7 @@ def main():
     # file_name = './connectome/c302_A_Syns.net.nml'
     # file_name = './connectome/c302_B_Syns.net.nml'
     file_name = './connectome/c302_B_Full.net.nml'
+    # file_name = './connectome/c302_A_Full.net.nml'
 
     linker = Linker("0.0.0.0", 5000)  # Creates link to robotic interface
     gui = GUI()  # Creates new visual monitoring interface
@@ -57,6 +59,10 @@ def main():
         global current_time, running
         update_counter = 0
         t = 0
+        fw = list()
+        bw = list()
+        lw = list()
+        rw = list()
         for t in range(0, len(T)):
             for generator in generators:
                 generator.compute(neurons, T[t])
@@ -69,10 +75,41 @@ def main():
                 F[tag][t] = neurons[tag].get_last_frequency()
 
                 # Updates the GUI each 100 ticks
-                if update_counter == 100:
+                if update_counter == 10:
                     gui.update_neuron(tag, F[tag][t])
-                elif update_counter > 100:
+                elif update_counter > 10:
                     update_counter = 0
+
+            if update_counter == 1:
+                print('PVC: ' + str(F['PVCL'][t] + F['PVCR'][t]))
+                print('AVB: ' + str(F['AVBL'][t] + F['AVBR'][t]))
+                print()
+                print('AVA: ' + str(F['AVAL'][t] + F['AVAR'][t]))
+                print('AVD: ' + str(F['AVDL'][t] + F['AVDR'][t]))
+                print('AVE: ' + str(F['AVEL'][t] + F['AVER'][t]))
+                print()
+                fw.append((F['AVBL'][t] + F['AVBR'][t] + F['PVCL'][t] + F['PVCR'][t]) / 4)
+                if len(fw) > 10:
+                    fw.pop(0)
+                print('forward: ' + str(sum(fw) / 10))
+                bw.append((F['AVAL'][t] + F['AVAR'][t] + F['AVDL'][t] + F['AVDR'][t] + F['AVEL'][t] + F['AVER'][t]) / 6)
+                if len(bw) > 10:
+                    bw.pop(0)
+                print('backward: ' + str(sum(bw)/10))
+                print()
+
+                lw.append(F['AVAL'][t] + F['AVDL'][t] + F['AVEL'][t])
+                if len(lw) > 10:
+                    lw.pop(0)
+                print('lf'+str(sum(lw)/10))
+                rw.append(F['AVAR'][t] + F['AVDR'][t] + F['AVER'][t])
+                if len(rw) > 10:
+                    rw.pop(0)
+                print('rf' + str(sum(rw)/10))
+
+
+
+                time.sleep(0.001)
 
             for synapse in synapses:
                 synapse.compute(neurons, T[t])
@@ -83,6 +120,51 @@ def main():
                 gui.update_robot_status(linker.is_connected())
                 linker.update_time(T[t])
                 linker.enable_robot(gui.is_robot_enabled())
+
+            if gui.get_nose_s_touch():
+                neurons['FLPR'].inject_current(5e-12)
+                neurons['FLPL'].inject_current(5e-12)
+                neurons['ASHL'].inject_current(5e-12)
+                neurons['ASHR'].inject_current(5e-12)
+                neurons['IL1VL'].inject_current(5e-12)
+                neurons['IL1VR'].inject_current(5e-12)
+                neurons['OLQDL'].inject_current(5e-12)
+                neurons['OLQDR'].inject_current(5e-12)
+                neurons['OLQVR'].inject_current(5e-12)
+                neurons['OLQVL'].inject_current(5e-12)
+
+            if gui.get_nose_h_touch():
+                neurons['FLPR'].inject_current(8e-12)
+                neurons['FLPL'].inject_current(8e-12)
+                neurons['ASHL'].inject_current(8e-12)
+                neurons['ASHR'].inject_current(8e-12)
+                neurons['IL1VL'].inject_current(8e-12)
+                neurons['IL1VR'].inject_current(8e-12)
+                neurons['OLQDL'].inject_current(8e-12)
+                neurons['OLQDR'].inject_current(8e-12)
+                neurons['OLQVR'].inject_current(8e-12)
+                neurons['OLQVL'].inject_current(8e-12)
+
+            if gui.get_l_side_touch():
+                neurons['ALML'].inject_current(20e-12)
+                neurons['PLML'].inject_current(20e-12)
+                neurons['AVM'].inject_current(20e-12)
+                neurons['PVDL'].inject_current(20e-12)
+                neurons['ADEL'].inject_current(20e-12)
+                neurons['PDEL'].inject_current(20e-12)
+
+            if gui.get_r_side_touch():
+                neurons['ALMR'].inject_current(20e-12)
+                neurons['PLMR'].inject_current(20e-12)
+                neurons['AVM'].inject_current(20e-12)
+                neurons['PVDR'].inject_current(20e-12)
+                neurons['ADER'].inject_current(20e-12)
+                neurons['PDER'].inject_current(20e-12)
+
+            neurons['PVDL'].inject_current(20e-12)
+            neurons['PVDR'].inject_current(20e-12)
+            neurons['PVCL'].inject_current(20e-12)
+            neurons['PVCR'].inject_current(20e-12)
 
             update_counter += 1
             current_time = t

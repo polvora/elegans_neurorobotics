@@ -88,7 +88,7 @@ class Linker(Thread):
     def compute_axes(self):
         message = ""
         for n in range(0, 9):
-            axis_angle = 90 + (40*math.cos(n + (10*self.time)))
+            axis_angle = 90 + (40*math.cos(n + (-1*10*self.time))) + 10
             message += "AX{:d}: {:03.0f} ; ".format(n, axis_angle)
 
         message += "\n"

@@ -105,15 +105,15 @@ class GUI:
                  bd=1,
                  relief=tK.SOLID,
                  width=45,
-                 height=16,
+                 height=14,
                  bg='white'
                  ).grid(column=0,
-                        row=6,
+                        row=5,
                         columnspan=2,
-                        rowspan=9)
+                        rowspan=11)
 
         tK.Label(self.window,
-                 text="Mechanosensation:",
+                 text="Mechanosensation",
                  fg='black',
                  bg='white',
                  width=15,
@@ -124,35 +124,52 @@ class GUI:
                   padx=(20, 0)
                   )
 
-        self.nose_touch_btn = tK.Button(self.window,
-                                        text="Nose Touch",
-                                        width=15)
-        self.nose_touch_btn.grid(column=0,
-                                 row=7,
-                                 columnspan=2)
-        self.neck_touch_btn = tK.Button(self.window,
-                                        text="Neck Touch",
-                                        width=15)
-        self.neck_touch_btn.grid(column=0,
-                                 row=9,
-                                 columnspan=2)
-        self.lside_touch_btn = tK.Button(self.window,
-                                         text="L. Side Touch",
-                                         width=15)
-        self.lside_touch_btn.grid(column=0,
-                                  row=11)
-        self.rside_touch_btn = tK.Button(self.window,
-                                         text="R. Side Touch",
-                                         width=15)
-        self.rside_touch_btn.grid(column=1,
-                                  row=11)
+        self.nose_s_touch_active = False
+        self.nose_s_touch_btn = tK.Button(self.window,
+                                          text="Nose Touch (Soft)",
+                                          width=15)
+        self.nose_s_touch_btn.grid(column=0,
+                                   row=7,
+                                   columnspan=2)
+
+        self.nose_s_touch_btn.bind('<ButtonPress-1>', partial(self.update_nose_s_touch, state=True))
+        self.nose_s_touch_btn.bind('<ButtonRelease-1>', partial(self.update_nose_s_touch, state=False))
+
+        self.nose_h_touch_active = False
+        self.nose_h_touch_btn = tK.Button(self.window,
+                                          text="Nose Touch (Harsh)",
+                                          width=15)
+        self.nose_h_touch_btn.grid(column=0,
+                                   row=9,
+                                   columnspan=2)
+        self.nose_h_touch_btn.bind('<ButtonPress-1>', partial(self.update_nose_h_touch, state=True))
+        self.nose_h_touch_btn.bind('<ButtonRelease-1>', partial(self.update_nose_h_touch, state=False))
+
+        self.l_side_touch_active = False
+        self.l_side_touch_btn = tK.Button(self.window,
+                                          text="L. Side Touch",
+                                          width=15)
+        self.l_side_touch_btn.grid(column=0,
+                                   row=11)
+        self.l_side_touch_btn.bind('<ButtonPress-1>', partial(self.update_l_side_touch, state=True))
+        self.l_side_touch_btn.bind('<ButtonRelease-1>', partial(self.update_l_side_touch, state=False))
+
+        self.r_side_touch_active = False
+        self.r_side_touch_btn = tK.Button(self.window,
+                                          text="R. Side Touch",
+                                          width=15)
+        self.r_side_touch_btn.grid(column=1,
+                                   row=11)
+        self.r_side_touch_btn.bind('<ButtonPress-1>', partial(self.update_r_side_touch, state=True))
+        self.r_side_touch_btn.bind('<ButtonRelease-1>', partial(self.update_r_side_touch, state=False))
+
+        self.tail_touch_active = False
         self.tail_touch_btn = tK.Button(self.window,
                                         text="Tail Touch",
                                         width=15)
         self.tail_touch_btn.grid(column=0,
                                  row=13,
                                  columnspan=2)
-
 
     def disable_robot(self):
         self.enable_robot_btn.config(state=tK.NORMAL)
@@ -221,3 +238,27 @@ class GUI:
 
     def stop(self):
         self.window.destroy()
+
+    def update_nose_s_touch(self, _event, state):
+        self.nose_s_touch_active = state
+
+    def get_nose_s_touch(self):
+        return self.nose_s_touch_active
+
+    def update_nose_h_touch(self, _event, state):
+        self.nose_h_touch_active = state
+
+    def get_nose_h_touch(self):
+        return self.nose_h_touch_active
+
+    def update_l_side_touch(self, _event, state):
+        self.l_side_touch_active = state
+
+    def get_l_side_touch(self):
+        return self.l_side_touch_active
+
+    def update_r_side_touch(self, _event, state):
+        self.r_side_touch_active = state
+
+    def get_r_side_touch(self):
+        return self.r_side_touch_active
