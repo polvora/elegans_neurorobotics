@@ -170,6 +170,8 @@ class GUI:
         self.tail_touch_btn.grid(column=0,
                                  row=13,
                                  columnspan=2)
+        self.tail_touch_btn.bind('<ButtonPress-1>', partial(self.update_tail_touch, state=True))
+        self.tail_touch_btn.bind('<ButtonRelease-1>', partial(self.update_tail_touch, state=False))
 
     def disable_robot(self):
         self.enable_robot_btn.config(state=tK.NORMAL)
@@ -262,3 +264,21 @@ class GUI:
 
     def get_r_side_touch(self):
         return self.r_side_touch_active
+
+    def update_tail_touch(self, _event, state):
+        self.tail_touch_active = state
+
+    def get_tail_touch(self):
+        return self.tail_touch_active
+
+    def show_nose_h_touch(self, state):
+        if state:
+            self.nose_h_touch_btn.config(bg="tomato")
+        else:
+            self.nose_h_touch_btn.config(bg="SystemButtonFace")
+
+    def show_tail_touch(self, state):
+        if state:
+            self.tail_touch_btn.config(bg="tomato")
+        else:
+            self.tail_touch_btn.config(bg="SystemButtonFace")

@@ -60,8 +60,6 @@ def main():
         t = 0
         fw = list()
         bw = list()
-        lw = list()
-        rw = list()
         for t in range(0, len(T)):
             for generator in generators:
                 generator.compute(neurons, T[t])
@@ -79,128 +77,6 @@ def main():
                 elif update_counter > 10:
                     update_counter = 0
 
-            if update_counter == 1:
-                print('PVC: ' + str(F['PVCL'][t] + F['PVCR'][t]))
-                print('AVB: ' + str(F['AVBL'][t] + F['AVBR'][t]))
-                print()
-                print('AVA: ' + str(F['AVAL'][t] + F['AVAR'][t]))
-                print('AVD: ' + str(F['AVDL'][t] + F['AVDR'][t]))
-                print('AVE: ' + str(F['AVEL'][t] + F['AVER'][t]))
-                print()
-                fw.append((F['AVBL'][t] + F['AVBR'][t] + F['PVCL'][t] + F['PVCR'][t]) / 4)
-                if len(fw) > 10:
-                    fw.pop(0)
-                print('forward: ' + str(sum(fw) / 10))
-                bw.append((F['AVAL'][t] + F['AVAR'][t] + F['AVDL'][t] + F['AVDR'][t] + F['AVEL'][t] + F['AVER'][t]) / 6)
-                if len(bw) > 10:
-                    bw.pop(0)
-                print('backward: ' + str(sum(bw)/10))
-                print()
-
-                lw.append((float((1 if F['MDL01'][t] > 0 else 0) +
-                           (1 if F['MDL02'][t] > 0 else 0) +
-                           (1 if F['MDL03'][t] > 0 else 0) +
-                           (1 if F['MDL04'][t] > 0 else 0) +
-                           (1 if F['MDL05'][t] > 0 else 0) +
-                           (1 if F['MDL06'][t] > 0 else 0) +
-                           (1 if F['MDL07'][t] > 0 else 0) +
-                           (1 if F['MDL08'][t] > 0 else 0) +
-                           (1 if F['MDL09'][t] > 0 else 0) +
-                           (1 if F['MDL10'][t] > 0 else 0) +
-                           (1 if F['MDL11'][t] > 0 else 0) +
-                           (1 if F['MDL12'][t] > 0 else 0) +
-                           (1 if F['MDL13'][t] > 0 else 0) +
-                           (1 if F['MDL14'][t] > 0 else 0) +
-                           (1 if F['MDL15'][t] > 0 else 0) +
-                           (1 if F['MDL16'][t] > 0 else 0) +
-                           (1 if F['MDL17'][t] > 0 else 0) +
-                           (1 if F['MDL18'][t] > 0 else 0) +
-                           (1 if F['MDL19'][t] > 0 else 0) +
-                           (1 if F['MDL20'][t] > 0 else 0) +
-                           (1 if F['MDL21'][t] > 0 else 0) +
-                           (1 if F['MDL22'][t] > 0 else 0) +
-                           (1 if F['MDL23'][t] > 0 else 0) +
-                           (1 if F['MDL24'][t] > 0 else 0) +
-                           (1 if F['MVL01'][t] > 0 else 0) +
-                           (1 if F['MVL02'][t] > 0 else 0) +
-                           (1 if F['MVL03'][t] > 0 else 0) +
-                           (1 if F['MVL04'][t] > 0 else 0) +
-                           (1 if F['MVL05'][t] > 0 else 0) +
-                           (1 if F['MVL06'][t] > 0 else 0) +
-                           (1 if F['MVL07'][t] > 0 else 0) +
-                           (1 if F['MVL08'][t] > 0 else 0) +
-                           (1 if F['MVL09'][t] > 0 else 0) +
-                           (1 if F['MVL10'][t] > 0 else 0) +
-                           (1 if F['MVL11'][t] > 0 else 0) +
-                           (1 if F['MVL12'][t] > 0 else 0) +
-                           (1 if F['MVL13'][t] > 0 else 0) +
-                           (1 if F['MVL14'][t] > 0 else 0) +
-                           (1 if F['MVL15'][t] > 0 else 0) +
-                           (1 if F['MVL16'][t] > 0 else 0) +
-                           (1 if F['MVL17'][t] > 0 else 0) +
-                           (1 if F['MVL18'][t] > 0 else 0) +
-                           (1 if F['MVL19'][t] > 0 else 0) +
-                           (1 if F['MVL20'][t] > 0 else 0) +
-                           (1 if F['MVL21'][t] > 0 else 0) +
-                           (1 if F['MVL22'][t] > 0 else 0) +
-                           (1 if F['MVL23'][t] > 0 else 0) +
-                           (1 if F['MVL24'][t] > 0 else 0))/48))
-                if len(lw) > 10:
-                    lw.pop(0)
-                print('lw'+str(lw[len(lw)-1]))
-                rw.append((float((1 if F['MDR01'][t] > 0 else 0) +
-                           (1 if F['MDR02'][t] > 0 else 0) +
-                           (1 if F['MDR03'][t] > 0 else 0) +
-                           (1 if F['MDR04'][t] > 0 else 0) +
-                           (1 if F['MDR05'][t] > 0 else 0) +
-                           (1 if F['MDR06'][t] > 0 else 0) +
-                           (1 if F['MDR07'][t] > 0 else 0) +
-                           (1 if F['MDR08'][t] > 0 else 0) +
-                           (1 if F['MDR09'][t] > 0 else 0) +
-                           (1 if F['MDR10'][t] > 0 else 0) +
-                           (1 if F['MDR11'][t] > 0 else 0) +
-                           (1 if F['MDR12'][t] > 0 else 0) +
-                           (1 if F['MDR13'][t] > 0 else 0) +
-                           (1 if F['MDR14'][t] > 0 else 0) +
-                           (1 if F['MDR15'][t] > 0 else 0) +
-                           (1 if F['MDR16'][t] > 0 else 0) +
-                           (1 if F['MDR17'][t] > 0 else 0) +
-                           (1 if F['MDR18'][t] > 0 else 0) +
-                           (1 if F['MDR19'][t] > 0 else 0) +
-                           (1 if F['MDR20'][t] > 0 else 0) +
-                           (1 if F['MDR21'][t] > 0 else 0) +
-                           (1 if F['MDR22'][t] > 0 else 0) +
-                           (1 if F['MDR23'][t] > 0 else 0) +
-                           (1 if F['MDR24'][t] > 0 else 0) +
-                           (1 if F['MVR01'][t] > 0 else 0) +
-                           (1 if F['MVR02'][t] > 0 else 0) +
-                           (1 if F['MVR03'][t] > 0 else 0) +
-                           (1 if F['MVR04'][t] > 0 else 0) +
-                           (1 if F['MVR05'][t] > 0 else 0) +
-                           (1 if F['MVR06'][t] > 0 else 0) +
-                           (1 if F['MVR07'][t] > 0 else 0) +
-                           (1 if F['MVR08'][t] > 0 else 0) +
-                           (1 if F['MVR09'][t] > 0 else 0) +
-                           (1 if F['MVR10'][t] > 0 else 0) +
-                           (1 if F['MVR11'][t] > 0 else 0) +
-                           (1 if F['MVR12'][t] > 0 else 0) +
-                           (1 if F['MVR13'][t] > 0 else 0) +
-                           (1 if F['MVR14'][t] > 0 else 0) +
-                           (1 if F['MVR15'][t] > 0 else 0) +
-                           (1 if F['MVR16'][t] > 0 else 0) +
-                           (1 if F['MVR17'][t] > 0 else 0) +
-                           (1 if F['MVR18'][t] > 0 else 0) +
-                           (1 if F['MVR19'][t] > 0 else 0) +
-                           (1 if F['MVR20'][t] > 0 else 0) +
-                           (1 if F['MVR21'][t] > 0 else 0) +
-                           (1 if F['MVR22'][t] > 0 else 0) +
-                           (1 if F['MVR23'][t] > 0 else 0) +
-                           (1 if F['MVR24'][t] > 0 else 0))/48))
-                if len(rw) > 10:
-                    rw.pop(0)
-                print('rw' + str(rw[len(rw)-1]))
-                time.sleep(0.001)
-
             for synapse in synapses:
                 synapse.compute(neurons, T[t])
 
@@ -211,7 +87,14 @@ def main():
                 linker.update_time(T[t])
                 linker.enable_robot(gui.is_robot_enabled())
 
-            if gui.get_nose_s_touch():
+            # Initial stimuli
+            neurons['PVDL'].inject_current(20e-12)
+            neurons['PVDR'].inject_current(20e-12)
+            neurons['PVCL'].inject_current(20e-12)
+            neurons['PVCR'].inject_current(20e-12)
+
+            if gui.get_nose_s_touch() or linker.get_left_sensor(0) < 4000:
+                gui.show_nose_h_touch(True)
                 neurons['FLPR'].inject_current(5e-12)
                 neurons['FLPL'].inject_current(5e-12)
                 neurons['ASHL'].inject_current(5e-12)
@@ -222,6 +105,8 @@ def main():
                 neurons['OLQDR'].inject_current(5e-12)
                 neurons['OLQVR'].inject_current(5e-12)
                 neurons['OLQVL'].inject_current(5e-12)
+            else:
+                gui.show_nose_h_touch(False)
 
             if gui.get_nose_h_touch():
                 neurons['FLPR'].inject_current(8e-12)
@@ -236,8 +121,8 @@ def main():
                 neurons['OLQVL'].inject_current(8e-12)
 
             if gui.get_l_side_touch():
-                neurons['ALML'].inject_current(100e-12)
-                neurons['PLML'].inject_current(100e-12)
+                neurons['ALML'].inject_current(20e-12)
+                neurons['PLML'].inject_current(20e-12)
                 neurons['FLPL'].inject_current(8e-12)
                 neurons['ASHL'].inject_current(8e-12)
                 neurons['IL1VL'].inject_current(8e-12)
@@ -245,18 +130,32 @@ def main():
                 neurons['OLQVL'].inject_current(8e-12)
 
             if gui.get_r_side_touch():
-                neurons['ALMR'].inject_current(100e-12)
-                neurons['PLMR'].inject_current(100e-12)
+                neurons['ALMR'].inject_current(20e-12)
+                neurons['PLMR'].inject_current(20e-12)
                 neurons['FLPR'].inject_current(8e-12)
                 neurons['ASHR'].inject_current(8e-12)
                 neurons['IL1VR'].inject_current(8e-12)
                 neurons['OLQDR'].inject_current(8e-12)
                 neurons['OLQVR'].inject_current(8e-12)
 
-            neurons['PVDL'].inject_current(20e-12)
-            neurons['PVDR'].inject_current(20e-12)
-            neurons['PVCL'].inject_current(20e-12)
-            neurons['PVCR'].inject_current(20e-12)
+            if gui.get_tail_touch() or linker.get_left_sensor(2) < 4000:
+                gui.show_tail_touch(True)
+                neurons['PVDL'].inject_current(20e-12)
+                neurons['PVDR'].inject_current(20e-12)
+                neurons['PVCL'].inject_current(20e-12)
+                neurons['PVCR'].inject_current(20e-12)
+            else:
+                gui.show_tail_touch(False)
+
+            # Calculates forward or backwards motion
+            fw.append((F['AVBL'][t] + F['AVBR'][t] + F['PVCL'][t] + F['PVCR'][t]) / 4)
+            if len(fw) > 3:
+                fw.pop(0)
+            bw.append((F['AVAL'][t] + F['AVAR'][t] + F['AVDL'][t] + F['AVDR'][t] + F['AVEL'][t] + F['AVER'][t]) / 6)
+            if len(bw) > 3:
+                bw.pop(0)
+            speed = (((sum(fw) / 3) - (sum(bw) / 3)) / 50) - 0.5
+            linker.set_speed(speed)
 
             update_counter += 1
             current_time = t
