@@ -82,6 +82,7 @@ def main():
                 gui.update_time(T[t])
                 gui.update_robot_status(linker.is_connected())
                 linker.update_time(T[t])
+                linker.enable_robot(gui.is_robot_enabled())
 
             update_counter += 1
             current_time = t
@@ -125,7 +126,7 @@ def print_statistics(simulation_time, elapsed_time, n_generators, n_neurons, n_s
 
 def plot_response(_event, key):
     global current_time
-    matlab.figure()
+    matlab.figure(num=key)
 
     print("GUI: Showing Plot Response for Neuron: " + key)
 

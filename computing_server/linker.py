@@ -25,20 +25,26 @@ class Linker(Thread):
 
         self.time = 0
 
+        self.enabled = True
+
+    def enable_robot(self, enable):
+        self.enabled = enable
+
     def run(self):
         while self.running:  # Checks if tasks should keep running
             self.server.settimeout(1.0)
             client = None
-            try:
-                client, address = self.server.accept()
-            except socket.timeout:
-                pass
+            if self.enabled:
+                try:
+                    client, address = self.server.accept()
+                except socket.timeout:
+                    pass
 
             if client is not None:
                 print("ROBOT LINK: Opening connection")
                 self.client_connected = True
 
-                while self.running:  # Checks if tasks should keep running
+                while self.running and self.enabled:  # Checks if tasks should keep running
                     client.settimeout(10.0)  # Sets 5 seconds of timeout
                     try:
                         content = client.recv(1)  # Receives the incoming characters one by one
